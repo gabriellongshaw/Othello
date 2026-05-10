@@ -1,0 +1,52 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes boardShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-5px); }
+  80%       { transform: translateX(5px); }
+}
+
+@keyframes flipToWhite {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(180deg); }
+}
+
+@keyframes flipToBlack {
+  0%   { transform: rotateY(180deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+@keyframes placeDiscWrapper {
+  0%   { transform: scale(0.1); opacity: 0; }
+  50%  { transform: scale(1.08); opacity: 1; }
+  75%  { transform: scale(0.97); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes validCellGlow {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 0.90; }
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scoreBump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.3); }
+  70%  { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}

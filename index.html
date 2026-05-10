@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Play Othello offline or online with friends!">
+  <meta name="keywords" content="Othello, Reversi, play Othello, Gabriel Longshaw">
+  <meta name="author" content="Gabriel Longshaw">
+  <title>Othello</title>
+  <meta name="theme-color" content="#f0f4f0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e1210" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicon/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon/favicon-16x16.png">
+  <link rel="shortcut icon" href="assets/images/favicon/favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL,GRAD,wght,opsz@1,0,500,24&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/fonts.css">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/components/screens.css">
+  <link rel="stylesheet" href="assets/css/components/buttons.css">
+</head>
+<body>
+  <div class="page">
+    <h1>Othello</h1>
+    <div class="button-container">
+      <a href="offline/" class="button"><i class="fa-solid fa-user-friends"></i> Play Offline</a>
+      <a href="online/" class="button" id="play-online-btn"><i class="fa-solid fa-wifi"></i> Play Online</a>
+      <a href="bot/" class="button"><i class="fa-solid fa-robot"></i> Play vs Bot</a>
+    </div>
+    <div class="credits-container">
+      <p><a class="credits-copyright">&copy;</a> 2026 Gabriel Longshaw. All rights reserved.</p>
+      <p>Created by <a class="credits-link" target="_blank" href="https://www.gabriellongshaw.co.uk">Gabriel Longshaw</a></p>
+    </div>
+  </div>
+  <script type="module" src="assets/js/pages/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+:root {
+  --bg: #e8ede8;
+  --secondary-bg: #dde5dd;
+  --card-bg: #ffffff;
+  --text: #0e1a10;
+  --meta-text: rgba(14, 26, 16, 0.52);
+  --border: #c0d0c0;
+  --header-color: #0e1a10;
+  --button-bg: #1a6b2a;
+  --button-bg-hover: #22883a;
+  --button-text: #ffffff;
+  --button-secondary-bg: #dce8dc;
+  --button-secondary-bg-hover: #c8dac8;
+  --button-secondary-text: #0e1a10;
+  --board-bg: #3f8f4e;
+  --board-border-outer: #1c4424;
+  --board-border-inner: rgba(255,255,255,0.14);
+  --board-line: #2e6b38;
+  --cell-bg: #428a50;
+  --cell-hover-bg: #50a460;
+  --cell-valid-bg: #428a50;
+  --valid-glow-color: rgba(180, 255, 200, 0.85);
+  --valid-cell-bg: #55a864;
+  --valid-cell-hover-bg: #62ba72;
+  --valid-glow-overlay: rgba(130, 255, 165, 0.45);
+  --player1-color: #111111;
+  --player1-shine: #555555;
+  --player2-color: #f8f8f8;
+  --player2-shine: #ffffff;
+  --winning-glow: #ffd700;
+  --input-bg: #ffffff;
+  --overlay-bg: rgba(180, 200, 180, 0.75);
+  --modal-bg: #ffffff;
+  --modal-text: #000000;
+  --shape-large: 20px;
+  --font-family: ProductSansRegular, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c100e;
+    --secondary-bg: #141a15;
+    --card-bg: #161c18;
+    --text: #e0ebe0;
+    --meta-text: rgba(224, 235, 224, 0.5);
+    --border: #263226;
+    --header-color: #e0ebe0;
+    --button-bg: #2a8040;
+    --button-bg-hover: #34a050;
+    --button-text: #ffffff;
+    --button-secondary-bg: #1a261a;
+    --button-secondary-bg-hover: #223022;
+    --button-secondary-text: #e0ebe0;
+    --board-bg: #336e3e;
+    --board-border-outer: #0f280f;
+    --board-border-inner: rgba(255,255,255,0.10);
+    --board-line: #225730;
+    --cell-bg: #366640;
+    --cell-hover-bg: #40804e;
+    --cell-valid-bg: #366640;
+    --valid-glow-color: rgba(150, 255, 175, 0.75);
+    --valid-cell-bg: #428052;
+    --valid-cell-hover-bg: #4e9460;
+    --valid-glow-overlay: rgba(110, 230, 145, 0.42);
+    --input-bg: #161c18;
+    --overlay-bg: rgba(0, 0, 0, 0.82);
+    --modal-bg: #121812;
+    --modal-text: #e0ebe0;
+  }
+}
