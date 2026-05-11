@@ -177,9 +177,6 @@
     0 2px 4px rgba(0,0,0,0.18);
 }
 
-.disc.winning-disc .disc-inner {
-  box-shadow: 0 0 0 2.5px rgba(255, 215, 0, 0.85);
-}
 
 .disc-ghost-wrapper {
   position: absolute;

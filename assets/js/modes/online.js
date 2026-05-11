@@ -11,7 +11,7 @@ import {
   countDiscs, isGameOver, getWinner,
   initBoardElement, renderBoardFull, showValidMoves, clearValidMoves,
   showPreview, clearPreview,
-  animatePlaceAndFlip, highlightWinners, clearWinnerHighlight,
+  animatePlaceAndFlip,
   animateRestart, updateScoreBar
 } from '../components/board.js';
 import { startConfetti, stopConfetti } from '../components/confetti.js';
@@ -124,7 +124,6 @@ export function startOnlineGame() {
   pendingMoveFlat = null;
   pendingRow = -1; pendingCol = -1; pendingFlips = [];
 
-  clearWinnerHighlight(boardEl);
   stopConfetti();
   setRestartVisible(false);
   if (sendBtn) sendBtn.disabled = true;
@@ -203,7 +202,6 @@ export async function commitOnlineMove() {
 
   if (gameOver) {
     gameActive = false;
-    if (!draw) highlightWinners(boardEl, boardState, winner);
     startConfetti();
     const { p1, p2 } = countDiscs(boardState);
     if (draw) setInfo(`Draw! ${p1}–${p2}`);
@@ -288,7 +286,6 @@ function subscribeToGame() {
       const winner = data.winner;
       const { p1, p2 } = countDiscs(boardState);
       if (winner !== 0) {
-        highlightWinners(boardEl, boardState, winner);
         if (winner === playerNumber) { leaderboard[playerNumber === 1 ? 'p1' : 'p2']++; startConfetti(); setInfo(`You win! 🎉`); }
         else { leaderboard[playerNumber === 1 ? 'p2' : 'p1']++; setInfo(`You lost!`); }
       } else {
@@ -302,7 +299,6 @@ function subscribeToGame() {
       return;
     }
 
-    clearWinnerHighlight(boardEl);
     gameActive = true;
 
     if (currentPlayer === playerNumber) {
@@ -325,7 +321,6 @@ export async function requestOnlineRestart() {
   if (playerNumber !== 1 || !gameId) return;
   try {
     setRestartVisible(false);
-    clearWinnerHighlight(boardEl);
     stopConfetti();
     await updateDoc(doc(db, 'othello_games', gameId), { restartRequest: true });
   } catch (err) {
@@ -346,7 +341,6 @@ async function handleRemoteRestart(data) {
       pendingMoveFlat = null;
       pendingRow = -1; pendingCol = -1; pendingFlips = [];
       if (sendBtn) sendBtn.disabled = true;
-      clearWinnerHighlight(boardEl);
       initBoardElement(boardEl, false);
       boardEl.style.opacity = '1';
       renderBoardFull(boardEl, boardState);
@@ -368,7 +362,6 @@ async function handleRemoteRestart(data) {
   }
 
   isRestarting = true;
-  clearWinnerHighlight(boardEl);
   stopConfetti();
   if (sendBtn) sendBtn.disabled = true;
   setInfo('Opponent is restarting…');

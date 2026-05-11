@@ -7,6 +7,7 @@ import {
   startOnlineGame, handleOnlineHover, handleOnlineSelect, commitOnlineMove,
   cancelPendingMove, requestOnlineRestart, leaveOnlineGame, clearOnlineBoard
 } from '../modes/online.js';
+import { initBoardElement } from '../components/board.js';
 import { waitForAuth } from '../core/firebase.js';
 
 function addTouchHover(selector) {
@@ -52,6 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   clearGameSession();
 
   boardEl.style.display = 'grid';
+  initBoardElement(boardEl, true);
   startOnlineGame();
 
   document.getElementById('leave-btn').addEventListener('click', async () => {

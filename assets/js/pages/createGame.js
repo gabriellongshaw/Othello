@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   createGame(
     code => {
       roomCodeSpan.textContent = code;
-      currentJoinUrl = location.origin + '/othello/online/join-game/?code=' + encodeURIComponent(code);
+      currentJoinUrl = location.origin + '/projects/Othello/online/join-game/?code=' + encodeURIComponent(code);
       roomCodeQr.innerHTML = '';
       new QRCode(roomCodeQr, {
         text: currentJoinUrl,
