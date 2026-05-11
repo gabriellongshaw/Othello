@@ -11,6 +11,10 @@ function addTouchHover(selector) {
   });
 }
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   applySystemTheme();
   initPageFadeIn();
