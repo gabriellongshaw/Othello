@@ -210,10 +210,12 @@ function endBotGame() {
   if (winner === 0) {
     setInfo(`Draw! ${p1}–${p2}`);
     leaderboard.draws++;
+    startConfetti();
   } else if (winner === 1) {
     highlightWinners(boardEl, boardState, 1);
     setInfo(`You win! ${p1}–${p2} 🎉`);
     leaderboard.player++;
+    startConfetti();
   } else {
     highlightWinners(boardEl, boardState, 2);
     setInfo(`Bot wins! ${p2}–${p1} 🤖`);
@@ -221,7 +223,6 @@ function endBotGame() {
   }
   setSubInfo('Press Restart to play again.');
   renderLeaderboard();
-  startConfetti();
 }
 
 export async function restartBotGame() {
@@ -354,23 +355,31 @@ function minimax(board, depth, alpha, beta, maximizing, player) {
   return best;
 }
 
+function greedyMove(board) {
+  const moves = getValidMoves(board, 2);
+  let best = null, bestCount = -1;
+  for (const [r, c] of moves) {
+    const flips = getFlips(board, r, c, 2).length;
+    if (flips > bestCount) { bestCount = flips; best = [r, c]; }
+  }
+  return best;
+}
+
 function chooseBotMove(board, diff) {
   const moves = getValidMoves(board, 2);
   if (moves.length === 0) return null;
   const rand = () => moves[Math.floor(Math.random() * moves.length)];
 
   if (diff === 'easy') {
-    if (Math.random() < 0.75) return rand();
-    const r = minimax(board, 2, -Infinity, Infinity, true, 2);
-    return r.row !== undefined ? [r.row, r.col] : rand();
+    return rand();
   }
   if (diff === 'medium') {
-    if (Math.random() < 0.2) return rand();
-    const r = minimax(board, 3, -Infinity, Infinity, true, 2);
-    return r.row !== undefined ? [r.row, r.col] : rand();
+    if (Math.random() < 0.55) return rand();
+    return greedyMove(board) || rand();
   }
   if (diff === 'hard') {
-    const r = minimax(board, 5, -Infinity, Infinity, true, 2);
+    if (Math.random() < 0.15) return rand();
+    const r = minimax(board, 2, -Infinity, Infinity, true, 2);
     return r.row !== undefined ? [r.row, r.col] : rand();
   }
   if (diff === 'expert') {
