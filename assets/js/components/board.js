@@ -186,8 +186,9 @@ export function showPreview(boardEl, row, col, flips, player) {
     const disc = getRealDisc(fc);
     if (!disc || disc.classList.contains('is-flipping')) continue;
     fc.classList.add('preview-flip');
-    const current = disc.style.transform || (disc.style.transform = player === 1 ? 'rotateY(180deg)' : 'rotateY(0deg)', disc.style.transform);
-    disc.dataset.origTransform = current;
+    const origTransform = player === 1 ? 'rotateY(180deg)' : 'rotateY(0deg)';
+    disc.dataset.origTransform = origTransform;
+    if (!disc.style.transform) disc.style.transform = origTransform;
     disc.style.transition = 'transform 0.18s ease';
     void disc.offsetWidth;
     disc.style.transform = toWhite ? 'rotateY(180deg)' : 'rotateY(0deg)';
@@ -217,13 +218,15 @@ export async function animatePlaceAndFlip(boardEl, row, col, player, flips) {
 
   cell.querySelectorAll('.disc-ghost-wrapper').forEach(g => g.remove());
   cell.classList.remove('preview-placing');
+
+  const previewFlipped = new Set();
   boardEl.querySelectorAll('.cell.preview-flip').forEach(fc => {
     fc.classList.remove('preview-flip');
     const d = getRealDisc(fc);
-    if (d && d.dataset.origTransform !== undefined) {
+    if (d) {
       d.style.transition = 'none';
-      d.style.transform = d.dataset.origTransform;
       delete d.dataset.origTransform;
+      previewFlipped.add(d);
     }
   });
 
@@ -240,7 +243,11 @@ export async function animatePlaceAndFlip(boardEl, row, col, player, flips) {
 
   const FLIP_DURATION = 320;
   const FLIP_STAGGER = 45;
+  const toWhite = player === 2;
+  const cls = toWhite ? 'flip-to-white' : 'flip-to-black';
+  const finalTransform = toWhite ? 'rotateY(180deg)' : 'rotateY(0deg)';
 
+  let animIdx = 0;
   for (let i = 0; i < flips.length; i++) {
     const [fr, fc] = flips[i];
     const fcell = getCell(boardEl, fr, fc);
@@ -248,13 +255,14 @@ export async function animatePlaceAndFlip(boardEl, row, col, player, flips) {
     const fd = getRealDisc(fcell);
     if (!fd) continue;
 
-    const toWhite = player === 2;
-    const cls = toWhite ? 'flip-to-white' : 'flip-to-black';
-    const finalTransform = toWhite ? 'rotateY(180deg)' : 'rotateY(0deg)';
+    if (previewFlipped.has(fd)) continue;
 
+    const delay = animIdx * FLIP_STAGGER;
+    animIdx++;
     setTimeout(() => {
       fd.style.transition = 'none';
       fd.classList.remove('flip-to-white', 'flip-to-black', 'is-flipping');
+      fd.style.transform = toWhite ? 'rotateY(0deg)' : 'rotateY(180deg)';
       void fd.offsetWidth;
       fd.classList.add('is-flipping', cls);
       const onDone = () => {
@@ -263,10 +271,11 @@ export async function animatePlaceAndFlip(boardEl, row, col, player, flips) {
       };
       fd.addEventListener('animationend', onDone, { once: true });
       setTimeout(onDone, FLIP_DURATION + 50);
-    }, i * FLIP_STAGGER);
+    }, delay);
   }
 
-  await new Promise(r => setTimeout(r, flips.length * FLIP_STAGGER + FLIP_DURATION + 60));
+  const waitTime = animIdx > 0 ? (animIdx - 1) * FLIP_STAGGER + FLIP_DURATION + 60 : 0;
+  await new Promise(r => setTimeout(r, waitTime));
 }
 
 export function highlightWinners(boardEl, board, winner) {

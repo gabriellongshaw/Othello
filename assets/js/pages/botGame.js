@@ -5,7 +5,7 @@ import { stopConfetti } from '../components/confetti.js';
 import {
   initBotRefs, setBotDifficulty, startBotGame,
   handleBotHover, handleBotSelect, commitBotMove,
-  restartBotGame, resetBotLeaderboard, clearBotBoard
+  cancelBotMove, restartBotGame, resetBotLeaderboard, clearBotBoard
 } from '../modes/bot.js';
 
 function addTouchHover(selector) {
@@ -53,6 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('restart-btn').addEventListener('click', () => restartBotGame());
 
   if (sendBtn) sendBtn.addEventListener('click', () => commitBotMove());
+
+  document.addEventListener('pointerdown', e => {
+    if (!boardEl.contains(e.target) && e.target !== sendBtn) cancelBotMove();
+  });
 
   boardEl.addEventListener('mouseover', e => {
     const cell = e.target.closest('.cell');

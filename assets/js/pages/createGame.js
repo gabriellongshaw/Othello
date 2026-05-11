@@ -20,26 +20,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   const roomCodeSpan = document.getElementById('room-code');
   const roomCodeQr = document.getElementById('room-code-qr');
   const roomCodeQrWrap = document.getElementById('room-code-qr-wrap');
-  const roomCodeCard = document.querySelector('.room-code-card');
-  const shareRow = document.querySelector('.create-share-row');
   const showQrToggle = document.getElementById('show-qr-toggle');
   const creatingStatus = document.getElementById('creating-status');
   const sendLinkBtn = document.getElementById('send-link-btn');
   const cancelBtn = document.getElementById('cancel-btn');
-  if (roomCodeCard) roomCodeCard.style.display = 'none';
-  if (shareRow) shareRow.style.display = 'none';
 
   let currentJoinUrl = '';
-  let cancelled = false;
+  let statusTimeout = null;
 
   function setCreatingStatus(text, isError = false) {
-    creatingStatus.textContent = text;
-    creatingStatus.classList.toggle('status-error', isError);
+    if (statusTimeout) { clearTimeout(statusTimeout); statusTimeout = null; }
+    creatingStatus.style.opacity = '0';
+    statusTimeout = setTimeout(() => {
+      creatingStatus.textContent = text;
+      creatingStatus.classList.toggle('status-error', isError);
+      creatingStatus.style.opacity = '';
+      statusTimeout = null;
+    }, 180);
   }
 
   function resetQr() {
-    if (roomCodeQr) roomCodeQr.innerHTML = '';
-    if (roomCodeQrWrap) roomCodeQrWrap.classList.remove('qr-panel-open');
+    roomCodeQr.innerHTML = '';
+    roomCodeQrWrap.classList.remove('qr-panel-open');
     if (showQrToggle) {
       showQrToggle.setAttribute('aria-expanded', 'false');
       showQrToggle.innerHTML = '<i class="fa-solid fa-qrcode"></i> Show QR Code';
@@ -61,7 +63,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         await navigator.share({ title: 'Othello', text: 'Join my Othello game!', url });
       } catch (err) {
-        if (err?.name !== 'AbortError') setCreatingStatus('Could not share. Try copying the link manually.', true);
+        if (err?.name !== 'AbortError') {
+          setCreatingStatus('Could not share. Try copying the link manually.', true);
+        }
       }
     } else {
       try {
@@ -76,52 +80,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   cancelBtn.addEventListener('click', async () => {
-    cancelled = true;
     resetQr();
     await cancelWaiting();
     navigateTo('../');
   });
 
-  setCreatingStatus('Connecting…');
-
   try {
     await waitForAuth();
   } catch (err) {
     console.error('Auth failed:', err);
-    setCreatingStatus('Authentication failed. Enable Anonymous Auth in your Firebase console.', true);
-    return;
   }
 
-  if (cancelled) return;
-
-  setCreatingStatus('Creating game…');
+  resetQr();
+  setCreatingStatus('');
   currentJoinUrl = '';
 
   createGame(
     code => {
-      if (cancelled) return;
       roomCodeSpan.textContent = code;
-      if (roomCodeCard) {
-        roomCodeCard.style.display = '';
-        roomCodeCard.style.opacity = '0';
-        roomCodeCard.style.transform = 'translateY(8px)';
-        requestAnimationFrame(() => {
-          roomCodeCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-          roomCodeCard.style.opacity = '1';
-          roomCodeCard.style.transform = 'translateY(0)';
-        });
-      }
-      if (shareRow) {
-        shareRow.style.display = '';
-        shareRow.style.opacity = '0';
-        setTimeout(() => {
-          shareRow.style.transition = 'opacity 0.3s ease';
-          shareRow.style.opacity = '1';
-        }, 120);
-      }
-      setCreatingStatus('Waiting for opponent…');
       currentJoinUrl = location.origin + '/othello/online/join-game/?code=' + encodeURIComponent(code);
-      resetQr();
+      roomCodeQr.innerHTML = '';
       new QRCode(roomCodeQr, {
         text: currentJoinUrl,
         width: 148,
@@ -134,7 +112,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       addTouchHover('#show-qr-toggle, #send-link-btn');
     },
     () => {
-      if (cancelled) return;
       saveGameSession();
       navigateTo('../game/');
     }

@@ -5,7 +5,7 @@ import { stopConfetti } from '../components/confetti.js';
 import {
   initOnlineRefs, loadGameSession, clearGameSession,
   startOnlineGame, handleOnlineHover, handleOnlineSelect, commitOnlineMove,
-  requestOnlineRestart, leaveOnlineGame, clearOnlineBoard
+  cancelPendingMove, requestOnlineRestart, leaveOnlineGame, clearOnlineBoard
 } from '../modes/online.js';
 import { waitForAuth } from '../core/firebase.js';
 
@@ -64,6 +64,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('restart-btn').addEventListener('click', () => requestOnlineRestart());
 
   if (sendBtn) sendBtn.addEventListener('click', () => commitOnlineMove());
+
+  document.addEventListener('pointerdown', e => {
+    if (!boardEl.contains(e.target) && e.target !== sendBtn) cancelPendingMove();
+  });
 
   boardEl.addEventListener('mouseover', e => {
     const cell = e.target.closest('.cell');

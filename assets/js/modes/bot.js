@@ -100,6 +100,14 @@ export function handleBotSelect(row, col) {
   setSubInfo('Click Send to confirm, or pick a different square.');
 }
 
+export function cancelBotMove() {
+  if (pendingRow === -1) return;
+  pendingRow = -1; pendingCol = -1; pendingFlips = [];
+  if (sendBtn) sendBtn.disabled = true;
+  clearPreview(boardEl);
+  setSubInfo('');
+}
+
 export async function commitBotMove() {
   if (!gameActive || isAnimating || pendingRow === -1 || currentPlayer !== 1) return;
   const row = pendingRow;
@@ -114,7 +122,6 @@ export async function commitBotMove() {
 
   isAnimating = true;
   clearValidMoves(boardEl);
-  clearPreview(boardEl);
 
   await animatePlaceAndFlip(boardEl, row, col, 1, flips);
   boardState = applyMove(boardState, row, col, 1);

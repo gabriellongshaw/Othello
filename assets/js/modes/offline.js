@@ -102,6 +102,14 @@ export function handleOfflineSelect(row, col) {
   setSubInfo('Click Send to confirm, or pick a different square.');
 }
 
+export function cancelOfflineMove() {
+  if (pendingRow === -1) return;
+  pendingRow = -1; pendingCol = -1; pendingFlips = [];
+  if (sendBtn) sendBtn.disabled = true;
+  clearPreview(boardEl);
+  setSubInfo('');
+}
+
 export async function commitMove() {
   if (!gameActive || isAnimating || pendingRow === -1) return;
   const row = pendingRow;
@@ -117,7 +125,6 @@ export async function commitMove() {
 
   isAnimating = true;
   clearValidMoves(boardEl);
-  clearPreview(boardEl);
 
   await animatePlaceAndFlip(boardEl, row, col, currentPlayer, flips);
   boardState = applyMove(boardState, row, col, currentPlayer);

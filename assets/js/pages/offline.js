@@ -4,7 +4,7 @@ import { initConfetti, resizeConfetti } from '../components/confetti.js';
 import {
   initOfflineRefs, startOfflineGame,
   handleOfflineHover, handleOfflineSelect, commitMove,
-  restartOfflineGame, clearOfflineBoard
+  cancelOfflineMove, restartOfflineGame, clearOfflineBoard
 } from '../modes/offline.js';
 
 function addTouchHover(selector) {
@@ -46,6 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('restart-btn').addEventListener('click', () => restartOfflineGame());
 
   if (sendBtn) sendBtn.addEventListener('click', () => commitMove());
+
+  document.addEventListener('pointerdown', e => {
+    if (!boardEl.contains(e.target) && e.target !== sendBtn) cancelOfflineMove();
+  });
 
   boardEl.addEventListener('mouseover', e => {
     const cell = e.target.closest('.cell');

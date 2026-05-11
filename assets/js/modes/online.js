@@ -172,6 +172,14 @@ export function handleOnlineSelect(row, col) {
   setSubInfo('Click Send to confirm, or pick a different square.');
 }
 
+export function cancelPendingMove() {
+  if (pendingRow === -1) return;
+  pendingRow = -1; pendingCol = -1; pendingFlips = [];
+  if (sendBtn) sendBtn.disabled = true;
+  clearPreview(boardEl);
+  setSubInfo('');
+}
+
 export async function commitOnlineMove() {
   if (!gameActive || isAnimating || pendingRow === -1 || currentPlayer !== playerNumber || !gameId) return;
   const row = pendingRow; const col = pendingCol; const flips = pendingFlips;
@@ -181,7 +189,6 @@ export async function commitOnlineMove() {
 
   isAnimating = true;
   clearValidMoves(boardEl);
-  clearPreview(boardEl);
 
   await animatePlaceAndFlip(boardEl, row, col, playerNumber, flips);
   boardState = applyMove(boardState, row, col, playerNumber);
