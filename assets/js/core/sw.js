@@ -1,3 +1,3 @@
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js');
-}
+navigator.serviceWorker.register('/projects/Othello/service-worker.js', {
+  scope: '/projects/Othello/'
+});
