@@ -1,4 +1,4 @@
-const CACHE = 'othello-v1';
+const CACHE = 'othello-v2';
 
 const STATIC = [
   '/',
@@ -54,24 +54,38 @@ const STATIC = [
   '/assets/js/pages/onlineGame.js',
 ];
 
+const FIREBASE_ORIGIN = 'https://www.gstatic.com';
+
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(c =>
       Promise.allSettled(STATIC.map(url => c.add(url)))
     )
   );
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
+    Promise.all([
+      caches.keys().then(keys =>
+        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      ),
+      self.clients.claim(),
+    ])
   );
 });
 
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(response => {
+        if (e.request.url.startsWith(FIREBASE_ORIGIN) && response.ok) {
+          caches.open(CACHE).then(c => c.put(e.request, response.clone()));
+        }
+        return response;
+      });
+    })
   );
 });
