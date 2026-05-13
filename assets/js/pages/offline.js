@@ -6,6 +6,7 @@ import {
   handleOfflineHover, handleOfflineSelect, commitMove,
   cancelOfflineMove, restartOfflineGame, clearOfflineBoard
 } from '../modes/offline.js';
+import { sendIcon } from '../core/icons.js';
 
 function addTouchHover(selector) {
   document.querySelectorAll(selector).forEach(el => {
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const boardEl = document.getElementById('board');
   const sendBtn = document.getElementById('send-btn');
+  if (sendBtn) sendBtn.insertAdjacentHTML('afterbegin', sendIcon);
 
   initOfflineRefs({
     boardEl,

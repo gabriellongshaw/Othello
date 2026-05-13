@@ -354,3 +354,11 @@
 
 .send-btn:not(:disabled):active { transform: scale(0.95);
 }
+
+.send-btn .send-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: block;
+  margin-right: -8px;
+}

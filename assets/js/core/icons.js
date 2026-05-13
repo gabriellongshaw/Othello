@@ -1,3 +1,8 @@
+export const sendIcon = `<svg class="send-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path d="M5.5 11.2c0 0 .1-.5.6-.7l11.2-4.4c.5-.2.9.1.8.6l-3.3 10.3c-.1.5-.6.6-.9.2l-2.6-3.5c-.2-.2-.5-.3-.7-.3l-4.5-1.5c-.5-.2-.6-.7-.2-.7z" fill="currentColor"/>
+  <path d="M10.8 13.7l1.8 2.4c.2.3.5.3.6 0l1.1-3.4c.1-.2 0-.4-.2-.5l-3.3-1.1c-.3-.1-.5 0-.5.3l.5 2.3z" fill="currentColor" opacity="0.4"/>
+</svg>`;
+
 export const difficultyIcons = {
   easy: `<svg viewBox="0 0 100 100" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><defs><mask id="mask-easy"><rect width="100" height="100" fill="black"/><circle cx="50" cy="50" r="45" fill="white"/><circle cx="33" cy="36" r="6" fill="black"/><circle cx="67" cy="36" r="6" fill="black"/><path d="M 22 55 C 22 88 78 88 78 55 L 22 55 Z" fill="black"/></mask></defs><rect width="100" height="100" fill="white" mask="url(#mask-easy)"/></svg>`,
   medium: `<svg viewBox="0 0 100 100" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><defs><mask id="mask-medium"><rect width="100" height="100" fill="black"/><circle cx="50" cy="50" r="45" fill="white"/><circle cx="33" cy="40" r="6" fill="black"/><circle cx="67" cy="40" r="6" fill="black"/><path d="M 30 65 Q 50 82 70 65" stroke="black" stroke-width="8" fill="none" stroke-linecap="round"/></mask></defs><rect width="100" height="100" fill="white" mask="url(#mask-medium)"/></svg>`,

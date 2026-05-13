@@ -7,6 +7,7 @@ import {
   handleBotHover, handleBotSelect, commitBotMove,
   cancelBotMove, restartBotGame, resetBotLeaderboard, clearBotBoard
 } from '../modes/bot.js';
+import { sendIcon } from '../core/icons.js';
 
 function addTouchHover(selector) {
   document.querySelectorAll(selector).forEach(el => {
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const boardEl = document.getElementById('board');
   const sendBtn = document.getElementById('send-btn');
+  if (sendBtn) sendBtn.insertAdjacentHTML('afterbegin', sendIcon);
 
   initBotRefs({
     boardEl,

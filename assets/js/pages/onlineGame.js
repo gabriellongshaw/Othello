@@ -9,6 +9,7 @@ import {
 } from '../modes/online.js';
 import { initBoardElement } from '../components/board.js';
 import { waitForAuth } from '../core/firebase.js';
+import { sendIcon } from '../core/icons.js';
 
 function addTouchHover(selector) {
   document.querySelectorAll(selector).forEach(el => {
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const boardEl = document.getElementById('board');
   const sendBtn = document.getElementById('send-btn');
+  if (sendBtn) sendBtn.insertAdjacentHTML('afterbegin', sendIcon);
 
   initOnlineRefs({
     boardEl,
