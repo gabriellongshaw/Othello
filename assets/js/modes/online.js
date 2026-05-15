@@ -250,24 +250,23 @@ function subscribeToGame() {
       if (isMine) return;
     }
 
-    let changedIdx = -1;
+    let placedIdx = -1;
+    const flipIdxs = [];
     for (let i = 0; i < newFlat.length; i++) {
-      if (oldFlat[i] !== newFlat[i]) { changedIdx = i; break; }
+      if (oldFlat[i] !== newFlat[i]) {
+        if (oldFlat[i] === 0) placedIdx = i;
+        else flipIdxs.push(i);
+      }
     }
 
     const newBoard = unflattenBoard(newFlat);
 
-    if (changedIdx !== -1 && !isAnimating && !isRestarting) {
-      const opRow = Math.floor(changedIdx / SIZE);
-      const opCol = changedIdx % SIZE;
-      const opPlayer = newFlat[changedIdx];
+    if (placedIdx !== -1 && !isAnimating && !isRestarting) {
+      const opRow = Math.floor(placedIdx / SIZE);
+      const opCol = placedIdx % SIZE;
+      const opPlayer = newFlat[placedIdx];
       if (opPlayer === 1 || opPlayer === 2) {
-        const opFlips = [];
-        for (let i = 0; i < newFlat.length; i++) {
-          if (oldFlat[i] !== newFlat[i] && i !== changedIdx) {
-            opFlips.push([Math.floor(i / SIZE), i % SIZE]);
-          }
-        }
+        const opFlips = flipIdxs.map(i => [Math.floor(i / SIZE), i % SIZE]);
         isAnimating = true;
         await animatePlaceAndFlip(boardEl, opRow, opCol, opPlayer, opFlips);
         isAnimating = false;
