@@ -3,7 +3,7 @@ import {
   deleteDoc, onSnapshot, query, where
 } from 'https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js';
 
-import { db, auth } from '../core/firebase.js';
+import { db, auth, waitForAuth } from '../core/firebase.js';
 import { generateCode } from '../core/utils.js';
 import {
   SIZE, createStartBoard, flattenBoard, unflattenBoard,
@@ -53,9 +53,10 @@ export async function createGame(onWaiting, onGameStart) {
   setStatus('Creating game…');
   const code = generateCode(7);
   try {
+    await waitForAuth();
     const ref = await addDoc(gamesRef, {
       code,
-      player1: auth.currentUser?.uid ?? "anonymous",
+      player1: auth.currentUser.uid,
       player2: null,
       board: flattenBoard(createStartBoard()),
       currentPlayer: 1,
@@ -81,17 +82,18 @@ export async function joinGame(code, onGameStart, onError) {
   if (!trimmed) { onError?.('Please enter a room code.'); return; }
   onError?.('Joining…');
   try {
+    await waitForAuth();
     const q = query(gamesRef, where('code', '==', trimmed));
     const snap = await getDocs(q);
     if (snap.empty) { onError?.('Game not found. Check the code and try again.'); return; }
     const docSnap = snap.docs[0];
     const data = docSnap.data();
-    if (auth.currentUser && data.player1 === auth.currentUser.uid) { onError?.('You created this game — share the code with a friend!'); return; }
-    if (data.player2 && auth.currentUser && data.player2 !== auth.currentUser.uid) { onError?.('This game already has two players.'); return; }
+    if (data.player1 === auth.currentUser.uid) { onError?.('You created this game — share the code with a friend!'); return; }
+    if (data.player2 && data.player2 !== auth.currentUser.uid) { onError?.('This game already has two players.'); return; }
     if (data.status === 'finished') { onError?.('This game has already ended.'); return; }
     gameId = docSnap.id;
     playerNumber = 2;
-    await updateDoc(doc(db, 'othello_games', gameId), { player2: auth.currentUser?.uid ?? "anonymous", status: 'playing' });
+    await updateDoc(doc(db, 'othello_games', gameId), { player2: auth.currentUser.uid, status: 'playing' });
     onError?.('');
     onGameStart();
     startOnlineGame();
@@ -218,6 +220,7 @@ export async function commitOnlineMove() {
   try {
     const nextMoves = !gameOver ? getValidMoves(boardState, nextPlayer) : [];
     const effectiveNext = (nextMoves.length === 0 && !gameOver) ? playerNumber : nextPlayer;
+    pendingMoveFlat = newFlat;
     await updateDoc(doc(db, 'othello_games', gameId), {
       board: newFlat,
       currentPlayer: gameOver ? currentPlayer : effectiveNext,
@@ -225,8 +228,8 @@ export async function commitOnlineMove() {
       winner: winner,
       draw: draw,
     });
-    pendingMoveFlat = newFlat;
   } catch (err) {
+    pendingMoveFlat = null;
     console.error('Move update failed:', err);
   }
 }
