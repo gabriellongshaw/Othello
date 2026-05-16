@@ -101,16 +101,9 @@ function createDiscEl(player) {
 function createGhostEl(player) {
   const wrapper = document.createElement('div');
   wrapper.className = 'disc-ghost-wrapper';
-  const disc = document.createElement('div');
-  disc.className = 'disc';
-  const black = document.createElement('div');
-  black.className = 'disc-inner disc-black';
-  const white = document.createElement('div');
-  white.className = 'disc-inner disc-white';
-  disc.appendChild(black);
-  disc.appendChild(white);
-  if (player === 2) disc.style.transform = 'rotateY(180deg)';
-  wrapper.appendChild(disc);
+  const face = document.createElement('div');
+  face.className = player === 1 ? 'disc-ghost-face disc-ghost-black' : 'disc-ghost-face disc-ghost-white';
+  wrapper.appendChild(face);
   return wrapper;
 }
 
@@ -127,6 +120,7 @@ function getRealDisc(cell) {
 }
 
 export function renderBoardFull(boardEl, board) {
+  clearPreview(boardEl);
   for (let r = 0; r < SIZE; r++) {
     for (let c = 0; c < SIZE; c++) {
       const cell = getCell(boardEl, r, c);
@@ -208,8 +202,7 @@ export function showPreview(boardEl, row, col, flips, player) {
 export function clearPreview(boardEl) {
   boardEl.querySelectorAll('.disc-ghost-wrapper').forEach(gw => {
     gw._cancelled = true;
-    gw.classList.remove('ghost-visible');
-    setTimeout(() => gw.remove(), 180);
+    gw.remove();
   });
   boardEl.querySelectorAll('.cell.preview-placing').forEach(c => c.classList.remove('preview-placing'));
   boardEl.querySelectorAll('.cell.preview-flip').forEach(cell => {
