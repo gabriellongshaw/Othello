@@ -183,7 +183,11 @@ export function showPreview(boardEl, row, col, flips, player) {
     placingCell.classList.add('preview-placing');
     const ghost = createGhostEl(player);
     placingCell.appendChild(ghost);
-    requestAnimationFrame(() => requestAnimationFrame(() => ghost.classList.add('ghost-visible')));
+    const raf1 = requestAnimationFrame(() => {
+      const raf2 = requestAnimationFrame(() => ghost.classList.add('ghost-visible'));
+      ghost._raf = raf2;
+    });
+    ghost._raf = raf1;
   }
 
   const toWhite = player === 2;
@@ -204,6 +208,7 @@ export function showPreview(boardEl, row, col, flips, player) {
 
 export function clearPreview(boardEl) {
   boardEl.querySelectorAll('.disc-ghost-wrapper').forEach(gw => {
+    if (gw._raf !== undefined) { cancelAnimationFrame(gw._raf); gw._raf = undefined; }
     gw.classList.remove('ghost-visible');
     setTimeout(() => gw.remove(), 180);
   });
