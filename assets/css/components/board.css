@@ -106,8 +106,7 @@
   opacity: 0.9;
 }
 
-.cell.preview-placing { 
-  background: var(--cell-bg) !important;
+.cell.preview-placing { background: var(--cell-bg) !important;
 }
 
 .cell.preview-placing::after { opacity: 0 !important; 
@@ -189,17 +188,17 @@
   width: 82%;
   height: 82%;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   pointer-events: none;
   z-index: 3;
-  opacity: 0;
-  transition: opacity 0.12s ease;
-  transform-style: preserve-3d;
 }
 
-.disc-ghost-wrapper.ghost-visible {
+.disc-ghost-wrapper .disc {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  will-change: opacity;
+}
+
+.disc-ghost-wrapper.ghost-visible .disc {
   opacity: 1;
 }
 
