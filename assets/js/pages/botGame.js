@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (sendBtn) sendBtn.addEventListener('click', () => commitBotMove());
 
   document.addEventListener('pointerdown', e => {
-    if (!boardEl.contains(e.target) && e.target !== sendBtn) cancelBotMove();
+    if (!boardEl.contains(e.target) && !sendBtn?.contains(e.target)) cancelBotMove();
   });
 
   boardEl.addEventListener('mouseover', e => {

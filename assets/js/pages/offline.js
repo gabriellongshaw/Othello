@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (sendBtn) sendBtn.addEventListener('click', () => commitMove());
 
   document.addEventListener('pointerdown', e => {
-    if (!boardEl.contains(e.target) && e.target !== sendBtn) cancelOfflineMove();
+    if (!boardEl.contains(e.target) && !sendBtn?.contains(e.target)) cancelOfflineMove();
   });
 
   boardEl.addEventListener('mouseover', e => {

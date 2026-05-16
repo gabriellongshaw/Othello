@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (sendBtn) sendBtn.addEventListener('click', () => commitOnlineMove());
 
   document.addEventListener('pointerdown', e => {
-    if (!boardEl.contains(e.target) && e.target !== sendBtn) cancelPendingMove();
+    if (!boardEl.contains(e.target) && !sendBtn?.contains(e.target)) cancelPendingMove();
   });
 
   boardEl.addEventListener('mouseover', e => {

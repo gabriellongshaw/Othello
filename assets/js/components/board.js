@@ -101,9 +101,16 @@ function createDiscEl(player) {
 function createGhostEl(player) {
   const wrapper = document.createElement('div');
   wrapper.className = 'disc-ghost-wrapper';
-  const face = document.createElement('div');
-  face.className = player === 1 ? 'disc-ghost-face disc-ghost-black' : 'disc-ghost-face disc-ghost-white';
-  wrapper.appendChild(face);
+  const disc = document.createElement('div');
+  disc.className = 'disc';
+  const black = document.createElement('div');
+  black.className = 'disc-inner disc-black';
+  const white = document.createElement('div');
+  white.className = 'disc-inner disc-white';
+  disc.appendChild(black);
+  disc.appendChild(white);
+  if (player === 2) disc.style.transform = 'rotateY(180deg)';
+  wrapper.appendChild(disc);
   return wrapper;
 }
 
@@ -224,7 +231,6 @@ export async function animatePlaceAndFlip(boardEl, row, col, player, flips) {
     fc.classList.remove('preview-flip');
     const d = getRealDisc(fc);
     if (d) {
-      d.style.transition = 'none';
       delete d.dataset.origTransform;
       previewFlipped.add(d);
     }
