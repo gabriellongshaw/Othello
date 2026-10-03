@@ -29,8 +29,8 @@
 }
 
 @keyframes validCellGlow {
-  0%, 100% { opacity: 0.55; }
-  50%       { opacity: 0.90; }
+  0%, 100% { opacity: 0.90; }
+  50%       { opacity: 0.55; }
 }
 
 

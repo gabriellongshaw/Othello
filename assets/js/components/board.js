@@ -157,10 +157,14 @@ export function renderBoardFull(boardEl, board) {
 }
 
 export function showValidMoves(boardEl, moves) {
-  boardEl.querySelectorAll('.cell.valid-move').forEach(c => c.classList.remove('valid-move'));
+  const wanted = new Set(moves.map(([r, c]) => r * SIZE + c));
+  boardEl.querySelectorAll('.cell.valid-move').forEach(cell => {
+    const idx = Number(cell.dataset.row) * SIZE + Number(cell.dataset.col);
+    if (!wanted.has(idx)) cell.classList.remove('valid-move');
+  });
   for (const [r, c] of moves) {
     const cell = getCell(boardEl, r, c);
-    if (cell) cell.classList.add('valid-move');
+    if (cell && !cell.classList.contains('valid-move')) cell.classList.add('valid-move');
   }
 }
 
@@ -168,25 +172,67 @@ export function clearValidMoves(boardEl) {
   boardEl.querySelectorAll('.cell.valid-move').forEach(c => c.classList.remove('valid-move'));
 }
 
-export function showPreview(boardEl, row, col, flips, player) {
-  clearPreview(boardEl);
-  if (row === -1) return;
+function fadeOutGhost(gw) {
+  gw._cancelled = true;
+  if (gw._fading) return;
+  gw._fading = true;
+  gw.classList.add('ghost-fading');
+  gw.classList.remove('ghost-visible');
+  setTimeout(() => gw.remove(), 180);
+}
 
+function resetPreview(boardEl, keepFlipCells) {
+  boardEl.querySelectorAll('.disc-ghost-wrapper').forEach(fadeOutGhost);
+  boardEl.querySelectorAll('.cell.preview-placing').forEach(c => c.classList.remove('preview-placing'));
+  boardEl.querySelectorAll('.cell.preview-flip').forEach(cell => {
+    if (keepFlipCells && keepFlipCells.has(cell)) return;
+    cell.classList.remove('preview-flip');
+    const disc = getRealDisc(cell);
+    if (disc && disc.dataset.origTransform !== undefined) {
+      disc.style.transition = 'transform 0.2s ease';
+      disc.style.transform = disc.dataset.origTransform;
+      delete disc.dataset.origTransform;
+    }
+  });
+}
+
+export function showPreview(boardEl, row, col, flips, player) {
+  if (row === -1) {
+    boardEl._previewKey = null;
+    resetPreview(boardEl);
+    return;
+  }
+
+  const key = `${row},${col},${player}`;
   const placingCell = getCell(boardEl, row, col);
+  if (boardEl._previewKey === key && placingCell &&
+      placingCell.classList.contains('preview-placing') &&
+      placingCell.querySelector('.disc-ghost-wrapper:not(.ghost-fading)')) {
+    return;
+  }
+  boardEl._previewKey = key;
+
+  const keep = new Set();
+  for (const [r, c] of flips) {
+    const fc = getCell(boardEl, r, c);
+    if (fc && fc.classList.contains('preview-flip')) keep.add(fc);
+  }
+  resetPreview(boardEl, keep);
+
   if (placingCell) {
     placingCell.classList.add('preview-placing');
     const ghost = createGhostEl(player);
     placingCell.appendChild(ghost);
     ghost._cancelled = false;
-    requestAnimationFrame(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
       if (!ghost._cancelled) ghost.classList.add('ghost-visible');
-    });
+    }));
   }
 
   const toWhite = player === 2;
   for (const [r, c] of flips) {
     const fc = getCell(boardEl, r, c);
-    if (!fc) continue;
+    if (!fc || keep.has(fc)) continue;
     const disc = getRealDisc(fc);
     if (!disc || disc.classList.contains('is-flipping')) continue;
     fc.classList.add('preview-flip');
@@ -200,26 +246,15 @@ export function showPreview(boardEl, row, col, flips, player) {
 }
 
 export function clearPreview(boardEl) {
-  boardEl.querySelectorAll('.disc-ghost-wrapper').forEach(gw => {
-    gw._cancelled = true;
-    gw.remove();
-  });
-  boardEl.querySelectorAll('.cell.preview-placing').forEach(c => c.classList.remove('preview-placing'));
-  boardEl.querySelectorAll('.cell.preview-flip').forEach(cell => {
-    cell.classList.remove('preview-flip');
-    const disc = getRealDisc(cell);
-    if (disc && disc.dataset.origTransform !== undefined) {
-      disc.style.transition = 'transform 0.2s ease';
-      disc.style.transform = disc.dataset.origTransform;
-      delete disc.dataset.origTransform;
-    }
-  });
+  boardEl._previewKey = null;
+  resetPreview(boardEl);
 }
 
 export async function animatePlaceAndFlip(boardEl, row, col, player, flips) {
   const cell = getCell(boardEl, row, col);
   if (!cell) return;
 
+  boardEl._previewKey = null;
   cell.querySelectorAll('.disc-ghost-wrapper').forEach(g => g.remove());
   cell.classList.remove('preview-placing');
 
