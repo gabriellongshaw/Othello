@@ -1,4 +1,4 @@
-const CACHE = 'othello-v2';
+const CACHE = 'othello-v3';
 
 const STATIC = [
   '/',
@@ -42,6 +42,7 @@ const STATIC = [
   '/assets/js/components/modal.js',
   '/assets/js/components/qrScanner.js',
   '/assets/js/modes/bot.js',
+  '/assets/js/modes/botEngine.js',
   '/assets/js/modes/offline.js',
   '/assets/js/modes/online.js',
   '/assets/js/pages/home.js',

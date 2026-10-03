@@ -7,6 +7,7 @@ import {
   animateRestart, updateScoreBar
 } from '../components/board.js';
 import { startConfetti, stopConfetti } from '../components/confetti.js';
+import { findBestMove } from './botEngine.js';
 
 let boardEl, infoEl, subInfoEl, restartBtn, leaderboardEl, scoreBarEl, sendBtn;
 
@@ -97,7 +98,7 @@ export function handleBotSelect(row, col) {
 
   showPreview(boardEl, row, col, flips, 1);
   if (sendBtn) sendBtn.disabled = false;
-  setSubInfo('Click Send to confirm, or pick a different square.');
+  setSubInfo('Click Place to confirm, or pick a different square.');
 }
 
 export function cancelBotMove() {
@@ -163,41 +164,60 @@ async function doBotMove() {
   isAnimating = true;
   clearValidMoves(boardEl);
 
-  const [row, col] = chooseBotMove(boardState, difficulty);
-  const flips = getFlips(boardState, row, col, 2);
+  try {
+    await new Promise(resolve => setTimeout(resolve, 30));
 
-  await animatePlaceAndFlip(boardEl, row, col, 2, flips);
-  boardState = applyMove(boardState, row, col, 2);
-  renderBoardFull(boardEl, boardState);
-  updateScoreBar(scoreBarEl, boardState);
+    const move = chooseBotMove(boardState, difficulty);
+    if (!move) {
+      isAnimating = false;
+      if (isGameOver(boardState)) { endBotGame(); return; }
+      currentPlayer = 1;
+      showValidMoves(boardEl, getValidMoves(boardState, 1));
+      setInfo('Bot has no moves — your turn again');
+      return;
+    }
+    const [row, col] = move;
+    const flips = getFlips(boardState, row, col, 2);
 
-  if (isGameOver(boardState)) {
-    endBotGame();
-    isAnimating = false;
-    return;
-  }
+    await animatePlaceAndFlip(boardEl, row, col, 2, flips);
+    boardState = applyMove(boardState, row, col, 2);
+    renderBoardFull(boardEl, boardState);
+    updateScoreBar(scoreBarEl, boardState);
 
-  const playerMoves = getValidMoves(boardState, 1);
-  if (playerMoves.length === 0) {
-    const botMoves2 = getValidMoves(boardState, 2);
-    if (botMoves2.length === 0) {
+    if (isGameOver(boardState)) {
       endBotGame();
       isAnimating = false;
       return;
     }
-    setInfo('You have no moves — bot plays again');
-    setSubInfo('');
-    currentPlayer = 2;
-    isAnimating = false;
-    setTimeout(doBotMove, 600);
-    return;
-  }
 
-  currentPlayer = 1;
-  showValidMoves(boardEl, playerMoves);
-  setInfo('Your turn (Black)');
-  setSubInfo('');
-  isAnimating = false;
+    const playerMoves = getValidMoves(boardState, 1);
+    if (playerMoves.length === 0) {
+      setInfo('You have no moves — bot plays again');
+      setSubInfo('');
+      currentPlayer = 2;
+      isAnimating = false;
+      setTimeout(doBotMove, 600);
+      return;
+    }
+
+    currentPlayer = 1;
+    showValidMoves(boardEl, playerMoves);
+    setInfo('Your turn (Black)');
+    setSubInfo('');
+    isAnimating = false;
+  } catch (err) {
+    console.error('bot move failed', err);
+    isAnimating = false;
+    renderBoardFull(boardEl, boardState);
+    const playerMoves = getValidMoves(boardState, 1);
+    if (playerMoves.length > 0) {
+      currentPlayer = 1;
+      showValidMoves(boardEl, playerMoves);
+      setInfo('Your turn (Black)');
+    } else {
+      endBotGame();
+    }
+  }
 }
 
 function endBotGame() {
@@ -304,57 +324,6 @@ function setSubInfo(text) {
   else subInfoEl.classList.remove('has-text');
 }
 
-const CORNER_WEIGHTS = [
-  [120, -20, 20, 5, 5, 20, -20, 120],
-  [-20, -40, -5, -5, -5, -5, -40, -20],
-  [20, -5, 15, 3, 3, 15, -5, 20],
-  [5, -5, 3, 3, 3, 3, -5, 5],
-  [5, -5, 3, 3, 3, 3, -5, 5],
-  [20, -5, 15, 3, 3, 15, -5, 20],
-  [-20, -40, -5, -5, -5, -5, -40, -20],
-  [120, -20, 20, 5, 5, 20, -20, 120],
-];
-
-function staticScore(board, player) {
-  const opp = player === 1 ? 2 : 1;
-  let score = 0;
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
-      if (board[r][c] === player) score += CORNER_WEIGHTS[r][c];
-      else if (board[r][c] === opp) score -= CORNER_WEIGHTS[r][c];
-    }
-  }
-  const myMoves = getValidMoves(board, player).length;
-  const oppMoves = getValidMoves(board, opp).length;
-  score += 10 * (myMoves - oppMoves);
-  return score;
-}
-
-function minimax(board, depth, alpha, beta, maximizing, player) {
-  if (depth === 0 || isGameOver(board)) {
-    return { score: staticScore(board, player) };
-  }
-  const current = maximizing ? player : (player === 1 ? 2 : 1);
-  const moves = getValidMoves(board, current);
-  if (moves.length === 0) {
-    return minimax(board, depth - 1, alpha, beta, !maximizing, player);
-  }
-  let best = maximizing ? { score: -Infinity } : { score: Infinity };
-  for (const [r, c] of moves) {
-    const next = applyMove(board, r, c, current);
-    const result = minimax(next, depth - 1, alpha, beta, !maximizing, player);
-    if (maximizing) {
-      if (result.score > best.score) best = { score: result.score, row: r, col: c };
-      alpha = Math.max(alpha, best.score);
-    } else {
-      if (result.score < best.score) best = { score: result.score, row: r, col: c };
-      beta = Math.min(beta, best.score);
-    }
-    if (alpha >= beta) break;
-  }
-  return best;
-}
-
 function greedyMove(board) {
   const moves = getValidMoves(board, 2);
   let best = null, bestCount = -1;
@@ -365,27 +334,28 @@ function greedyMove(board) {
   return best;
 }
 
+const SEARCH_LIMITS = {
+  hard: { maxDepth: 3, timeMs: 150 },
+  expert: { maxDepth: 6, timeMs: 600 },
+  impossible: { maxDepth: 14, timeMs: 1400 },
+};
+
 function chooseBotMove(board, diff) {
   const moves = getValidMoves(board, 2);
   if (moves.length === 0) return null;
   const rand = () => moves[Math.floor(Math.random() * moves.length)];
 
-  if (diff === 'easy') {
-    return rand();
-  }
+  if (diff === 'easy') return rand();
   if (diff === 'medium') {
     if (Math.random() < 0.55) return rand();
     return greedyMove(board) || rand();
   }
-  if (diff === 'hard') {
-    if (Math.random() < 0.15) return rand();
-    const r = minimax(board, 2, -Infinity, Infinity, true, 2);
-    return r.row !== undefined ? [r.row, r.col] : rand();
+  if (diff === 'hard' && Math.random() < 0.15) return rand();
+
+  try {
+    return findBestMove(board, 2, SEARCH_LIMITS[diff] || SEARCH_LIMITS.impossible) || rand();
+  } catch (err) {
+    console.error('bot search failed, falling back to greedy move', err);
+    return greedyMove(board) || rand();
   }
-  if (diff === 'expert') {
-    const r = minimax(board, 7, -Infinity, Infinity, true, 2);
-    return r.row !== undefined ? [r.row, r.col] : rand();
-  }
-  const r = minimax(board, 9, -Infinity, Infinity, true, 2);
-  return r.row !== undefined ? [r.row, r.col] : rand();
 }
