@@ -170,7 +170,7 @@ export function handleOnlineSelect(row, col) {
     sendBtn.disabled = false;
     sendBtn.removeAttribute('disabled');
   }
-  setSubInfo('Click Send to confirm, or pick a different square.');
+  setSubInfo('Click Place to confirm, or pick a different square.');
 }
 
 export function cancelPendingMove() {
