@@ -89,7 +89,8 @@
   gap: 0;
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
   padding: 10px 20px;
   margin-bottom: 10px;
   width: 100%;
@@ -135,8 +136,8 @@
 }
 
 .lb-dot-player {
-  background: #111111;
-  border: 1px solid var(--border);
+  background: #1c2230;
+  border: 1px solid rgba(16, 38, 27, 0.3);
 }
 
 .lb-dot-player2 {
@@ -145,8 +146,8 @@
 }
 
 .lb-dot-bot {
-  background: #f8f8f8;
-  border: 1px solid var(--border);
+  background: #ffffff;
+  border: 1px solid rgba(16, 38, 27, 0.3);
 }
 
 .lb-name {

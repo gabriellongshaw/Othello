@@ -13,7 +13,7 @@ html {
   width: 100%;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(80, 120, 80, 0.4) transparent;
+  scrollbar-color: rgba(16, 185, 129, 0.4) transparent;
 }
 
 body {
@@ -42,11 +42,11 @@ body {
 }
 
 ::-webkit-scrollbar-thumb { 
-  background: rgba(80, 120, 80, 0.4);
+  background: rgba(16, 185, 129, 0.4);
   border-radius: 999px;
 }
 
-::-webkit-scrollbar-thumb:hover { background: rgba(80, 120, 80, 0.65); }
+::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.65); }
 
 h1 {
   font-weight: 800;
