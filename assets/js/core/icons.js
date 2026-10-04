@@ -1,4 +1,4 @@
-export const sendIcon = `<svg class="send-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
+export const sendIcon = `<svg class="send-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>`;
 
 export const difficultyIcons = {
   easy: `<svg viewBox="0 0 100 100" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><defs><mask id="mask-easy"><rect width="100" height="100" fill="black"/><circle cx="50" cy="50" r="45" fill="white"/><circle cx="33" cy="36" r="6" fill="black"/><circle cx="67" cy="36" r="6" fill="black"/><path d="M 22 55 C 22 88 78 88 78 55 L 22 55 Z" fill="black"/></mask></defs><rect width="100" height="100" fill="white" mask="url(#mask-easy)"/></svg>`,
