@@ -156,11 +156,24 @@ export function renderBoardFull(boardEl, board) {
   }
 }
 
+function fadeOutGlow(cell) {
+  if (!cell.animate) return;
+  const current = parseFloat(getComputedStyle(cell, '::after').opacity);
+  if (!(current > 0.02)) return;
+  cell.animate(
+    [{ opacity: current }, { opacity: 0 }],
+    { duration: 250, easing: 'ease', pseudoElement: '::after' }
+  );
+}
+
 export function showValidMoves(boardEl, moves) {
   const wanted = new Set(moves.map(([r, c]) => r * SIZE + c));
   boardEl.querySelectorAll('.cell.valid-move').forEach(cell => {
     const idx = Number(cell.dataset.row) * SIZE + Number(cell.dataset.col);
-    if (!wanted.has(idx)) cell.classList.remove('valid-move');
+    if (!wanted.has(idx)) {
+      fadeOutGlow(cell);
+      cell.classList.remove('valid-move');
+    }
   });
   for (const [r, c] of moves) {
     const cell = getCell(boardEl, r, c);
@@ -169,7 +182,10 @@ export function showValidMoves(boardEl, moves) {
 }
 
 export function clearValidMoves(boardEl) {
-  boardEl.querySelectorAll('.cell.valid-move').forEach(c => c.classList.remove('valid-move'));
+  boardEl.querySelectorAll('.cell.valid-move').forEach(c => {
+    fadeOutGlow(c);
+    c.classList.remove('valid-move');
+  });
 }
 
 function fadeOutGhost(gw) {
@@ -220,6 +236,7 @@ export function showPreview(boardEl, row, col, flips, player) {
   resetPreview(boardEl, keep);
 
   if (placingCell) {
+    fadeOutGlow(placingCell);
     placingCell.classList.add('preview-placing');
     const ghost = createGhostEl(player);
     placingCell.appendChild(ghost);

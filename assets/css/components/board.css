@@ -119,11 +119,6 @@
   background: var(--valid-cell-hover-bg);
 }
 
-.cell.valid-move:hover::after {
-  animation: none;
-  opacity: 0.9;
-}
-
 .cell.preview-placing { background: var(--cell-base) !important;
 }
 
