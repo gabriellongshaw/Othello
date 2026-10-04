@@ -285,7 +285,6 @@ export function resetBotLeaderboard() {
 function renderLeaderboard() {
   if (!leaderboardEl) return;
   const diffLabels = { easy: 'Easy', medium: 'Medium', hard: 'Hard', expert: 'Expert', impossible: 'Impossible' };
-  leaderboardEl.classList.remove('lb-visible');
   leaderboardEl.innerHTML = `
     <div class="lb-row">
       <span class="lb-dot lb-dot-player"></span>

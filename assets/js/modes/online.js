@@ -458,7 +458,6 @@ export function clearGameSession() {
 
 function renderLeaderboard() {
   if (!leaderboardEl) return;
-  leaderboardEl.classList.remove('lb-visible');
   leaderboardEl.innerHTML = `
     <div class="lb-row">
       <span class="lb-dot lb-dot-player"></span>
