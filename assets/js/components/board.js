@@ -73,8 +73,8 @@ export function initBoardElement(boardEl, firstInit) {
       cell.dataset.row = r;
       cell.dataset.col = c;
       if (firstInit) {
-        cell.style.opacity = '0';
-        setTimeout(() => { cell.style.transition = 'opacity 0.3s ease'; cell.style.opacity = '1'; }, 10);
+        cell.classList.add('cell-intro');
+        setTimeout(() => cell.classList.remove('cell-intro'), 350);
       }
       boardEl.appendChild(cell);
     }
@@ -156,14 +156,15 @@ export function renderBoardFull(boardEl, board) {
   }
 }
 
+const GLOW_FADE_MS = 250;
+
 function fadeOutGlow(cell) {
-  if (!cell.animate) return;
   const current = parseFloat(getComputedStyle(cell, '::after').opacity);
   if (!(current > 0.02)) return;
-  cell.animate(
-    [{ opacity: current }, { opacity: 0 }],
-    { duration: 250, easing: 'ease', pseudoElement: '::after' }
-  );
+  cell.style.setProperty('--glow-from', current);
+  cell.classList.add('valid-leaving');
+  clearTimeout(cell._glowTimer);
+  cell._glowTimer = setTimeout(() => cell.classList.remove('valid-leaving'), GLOW_FADE_MS + 30);
 }
 
 export function showValidMoves(boardEl, moves) {
@@ -175,9 +176,14 @@ export function showValidMoves(boardEl, moves) {
       cell.classList.remove('valid-move');
     }
   });
+  void boardEl.offsetWidth;
   for (const [r, c] of moves) {
     const cell = getCell(boardEl, r, c);
-    if (cell && !cell.classList.contains('valid-move')) cell.classList.add('valid-move');
+    if (cell && !cell.classList.contains('valid-move')) {
+      clearTimeout(cell._glowTimer);
+      cell.classList.remove('valid-leaving');
+      cell.classList.add('valid-move');
+    }
   }
 }
 

@@ -74,6 +74,10 @@
   --cell-base: var(--cell-alt-bg);
 }
 
+.cell.cell-intro {
+  animation: fadeIn 0.3s ease both;
+}
+
 .cell:nth-child(8n) { 
   border-right: none;
 }
@@ -82,8 +86,10 @@
   border-bottom: none;
 }
 
-.cell:hover { 
-  background: var(--cell-hover-bg);
+@media (hover: hover) {
+  .cell:hover {
+    background: var(--cell-hover-bg);
+  }
 }
 
 .cell.valid-move {
@@ -115,15 +121,22 @@
   animation: validCellGlow 1.8s ease-in-out 0.25s infinite;
 }
 
-.cell.valid-move:hover {
-  background: var(--valid-cell-hover-bg);
+@media (hover: hover) {
+  .cell.valid-move:hover {
+    background: var(--valid-cell-hover-bg);
+  }
 }
 
 .cell.preview-placing { background: var(--cell-base) !important;
 }
 
-.cell.preview-placing::after { opacity: 0 !important; 
-  animation: none !important;
+.cell.preview-placing::after {
+  opacity: 0;
+  animation: none;
+}
+
+.cell.valid-leaving::after {
+  animation: glowOut 0.25s ease forwards;
 }
 
 .disc-scale-wrapper {

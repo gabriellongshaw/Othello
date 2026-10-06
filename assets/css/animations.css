@@ -28,6 +28,11 @@
   100% { transform: scale(1);    opacity: 1; }
 }
 
+@keyframes glowOut {
+  from { opacity: var(--glow-from, 0.9); }
+  to   { opacity: 0; }
+}
+
 @keyframes validCellGlow {
   0%, 100% { opacity: 0.90; }
   50%       { opacity: 0.55; }
