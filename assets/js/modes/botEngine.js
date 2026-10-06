@@ -13,6 +13,16 @@ const RAYS = Array.from({ length: CELLS }, (_, i) => {
   }).filter(ray => ray.length > 1);
 });
 
+const NEIGHBOURS = Array.from({ length: CELLS }, (_, i) => {
+  const r0 = Math.floor(i / N), c0 = i % N;
+  const out = [];
+  for (const [dr, dc] of DIRS) {
+    const r = r0 + dr, c = c0 + dc;
+    if (r >= 0 && r < N && c >= 0 && c < N) out.push(r * N + c);
+  }
+  return out;
+});
+
 const WEIGHTS = [
   120, -20, 20, 5, 5, 20, -20, 120,
   -20, -40, -5, -5, -5, -5, -40, -20,
@@ -24,12 +34,25 @@ const WEIGHTS = [
   120, -20, 20, 5, 5, 20, -20, 120,
 ];
 
-const CORNERS = [
-  { corner: 0, near: [1, 8, 9] },
-  { corner: 7, near: [6, 15, 14] },
-  { corner: 56, near: [48, 57, 49] },
-  { corner: 63, near: [55, 62, 54] },
-];
+const CORNERS = [0, 7, 56, 63];
+
+const CORNER_OF = new Int8Array(CELLS).fill(-1);
+for (const [corner, squares] of [
+  [0, [1, 8, 9]], [7, [6, 15, 14]], [56, [48, 57, 49]], [63, [55, 62, 54]],
+]) {
+  for (const s of squares) CORNER_OF[s] = corner;
+}
+
+const X_SQUARES = new Set([9, 14, 49, 54]);
+
+const EDGE_RUNS = [];
+for (const [corner, steps] of [[0, [1, 8]], [7, [-1, 8]], [56, [1, -8]], [63, [-1, -8]]]) {
+  for (const step of steps) {
+    const run = [];
+    for (let k = 1; k <= 6; k++) run.push(corner + step * k);
+    EDGE_RUNS.push({ corner, run });
+  }
+}
 
 export function toFlat(board) {
   const flat = new Int8Array(CELLS);
@@ -63,12 +86,6 @@ function genMoves(b, p) {
   return moves;
 }
 
-function countMoves(b, p) {
-  let n = 0;
-  for (let i = 0; i < CELLS; i++) if (b[i] === 0 && flipsAt(b, i, p)) n++;
-  return n;
-}
-
 function play(b, move, p) {
   const next = b.slice();
   next[move.idx] = p;
@@ -82,25 +99,65 @@ function discDiff(b, p) {
   return s;
 }
 
+function stableEdgeDiscs(b, p) {
+  let n = 0;
+  for (const { corner, run } of EDGE_RUNS) {
+    if (b[corner] !== p) continue;
+    for (const idx of run) {
+      if (b[idx] !== p) break;
+      n++;
+    }
+  }
+  return n;
+}
+
+function squareValue(b, i, p) {
+  const w = WEIGHTS[i];
+  if (w >= 0) return w;
+  const corner = CORNER_OF[i];
+  if (corner < 0 || b[corner] === 0) return w;
+  return b[corner] === p ? 6 : 0;
+}
+
 function evaluate(b, p) {
   const opp = 3 - p;
-  let score = 0;
+  let positional = 0;
+  let mine = 0, theirs = 0;
+  let frontierMine = 0, frontierTheirs = 0;
   let empties = 0;
+
   for (let i = 0; i < CELLS; i++) {
     const v = b[i];
     if (v === 0) { empties++; continue; }
-    let w = WEIGHTS[i];
-    if (w < 0) {
-      for (const { corner, near } of CORNERS) {
-        if (b[corner] !== 0 && near.includes(i)) { w = 0; break; }
-      }
+    const sign = v === p ? 1 : -1;
+    positional += sign * squareValue(b, i, v);
+    if (v === p) mine++; else theirs++;
+    const nb = NEIGHBOURS[i];
+    for (let k = 0; k < nb.length; k++) {
+      if (b[nb[k]] === 0) { if (v === p) frontierMine++; else frontierTheirs++; break; }
     }
-    score += v === p ? w : -w;
   }
-  const mine = countMoves(b, p);
-  const theirs = countMoves(b, opp);
-  score += 12 * (mine - theirs);
-  if (empties < 16) score += (16 - empties) * 2 * discDiff(b, p);
+
+  let cornersMine = 0, cornersTheirs = 0;
+  for (let k = 0; k < 4; k++) {
+    const v = b[CORNERS[k]];
+    if (v === p) cornersMine++; else if (v === opp) cornersTheirs++;
+  }
+
+  const myMoves = genMoves(b, p);
+  const theirMoves = genMoves(b, opp);
+  let myCornerMoves = 0, theirCornerMoves = 0;
+  for (const m of myMoves) if (WEIGHTS[m.idx] === 120) myCornerMoves++;
+  for (const m of theirMoves) if (WEIGHTS[m.idx] === 120) theirCornerMoves++;
+
+  const mobilityWeight = empties > 20 ? 10 : 6;
+  let score = positional;
+  score += 90 * (cornersMine - cornersTheirs);
+  score += 30 * (myCornerMoves - theirCornerMoves);
+  score += 20 * (stableEdgeDiscs(b, p) - stableEdgeDiscs(b, opp));
+  score += mobilityWeight * (myMoves.length - theirMoves.length);
+  score -= 3 * (frontierMine - frontierTheirs);
+  if (empties < 20) score += (20 - empties) * 2 * (mine - theirs);
   return score;
 }
 
@@ -161,4 +218,64 @@ export function findBestMove(board, player, { maxDepth = 8, timeMs = 1000 } = {}
   }
 
   return [Math.floor(bestIdx / N), bestIdx % N];
+}
+
+function pick(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function toCoords(move) {
+  return [Math.floor(move.idx / N), move.idx % N];
+}
+
+function givesAwayCorner(b, move, p) {
+  const next = play(b, move, p);
+  for (const m of genMoves(next, 3 - p)) if (WEIGHTS[m.idx] === 120) return true;
+  return false;
+}
+
+function easyMove(b, moves, p) {
+  const corners = moves.filter(m => WEIGHTS[m.idx] === 120);
+  if (corners.length && Math.random() < 0.5) return pick(corners);
+  const safe = moves.filter(m => !(X_SQUARES.has(m.idx) && b[CORNER_OF[m.idx]] === 0));
+  if (safe.length && Math.random() < 0.5) return pick(safe);
+  return pick(moves);
+}
+
+function positionalMove(b, moves, p) {
+  let best = null, bestScore = -Infinity;
+  for (const m of moves) {
+    let s = squareValue(b, m.idx, p) + m.flips.length * 0.5;
+    if (WEIGHTS[m.idx] !== 120 && givesAwayCorner(b, m, p)) s -= 60;
+    s += Math.random() * 4;
+    if (s > bestScore) { bestScore = s; best = m; }
+  }
+  return best;
+}
+
+export const LEVELS = {
+  easy: { kind: 'easy' },
+  medium: { kind: 'positional', randomRate: 0.2 },
+  hard: { kind: 'search', maxDepth: 4, timeMs: 250, randomRate: 0.05 },
+  expert: { kind: 'search', maxDepth: 6, timeMs: 600, randomRate: 0 },
+  impossible: { kind: 'search', maxDepth: 14, timeMs: 1400, randomRate: 0 },
+};
+
+export function chooseMove(board, player, difficulty, overrides = {}) {
+  const b = toFlat(board);
+  const moves = genMoves(b, player);
+  if (moves.length === 0) return null;
+
+  const level = { ...(LEVELS[difficulty] || LEVELS.impossible), ...overrides };
+
+  if (level.kind === 'easy') return toCoords(easyMove(b, moves, player));
+  if (level.randomRate && Math.random() < level.randomRate) return toCoords(pick(moves));
+  if (level.kind === 'positional') return toCoords(positionalMove(b, moves, player));
+
+  try {
+    return findBestMove(board, player, level) || toCoords(pick(moves));
+  } catch (err) {
+    console.error('bot search failed, falling back to a positional move', err);
+    return toCoords(positionalMove(b, moves, player));
+  }
 }

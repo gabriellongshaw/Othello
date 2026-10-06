@@ -7,7 +7,7 @@ import {
   animateRestart, updateScoreBar
 } from '../components/board.js';
 import { startConfetti, stopConfetti } from '../components/confetti.js';
-import { findBestMove } from './botEngine.js';
+import { chooseMove } from './botEngine.js';
 
 let boardEl, infoEl, subInfoEl, restartBtn, leaderboardEl, scoreBarEl, sendBtn;
 
@@ -167,7 +167,7 @@ async function doBotMove() {
   try {
     await new Promise(resolve => setTimeout(resolve, 30));
 
-    const move = chooseBotMove(boardState, difficulty);
+    const move = chooseMove(boardState, 2, difficulty);
     if (!move) {
       isAnimating = false;
       if (isGameOver(boardState)) { endBotGame(); return; }
@@ -321,40 +321,4 @@ function setSubInfo(text) {
   subInfoEl.textContent = text;
   if (text) subInfoEl.classList.add('has-text');
   else subInfoEl.classList.remove('has-text');
-}
-
-function greedyMove(board) {
-  const moves = getValidMoves(board, 2);
-  let best = null, bestCount = -1;
-  for (const [r, c] of moves) {
-    const flips = getFlips(board, r, c, 2).length;
-    if (flips > bestCount) { bestCount = flips; best = [r, c]; }
-  }
-  return best;
-}
-
-const SEARCH_LIMITS = {
-  hard: { maxDepth: 3, timeMs: 150 },
-  expert: { maxDepth: 6, timeMs: 600 },
-  impossible: { maxDepth: 14, timeMs: 1400 },
-};
-
-function chooseBotMove(board, diff) {
-  const moves = getValidMoves(board, 2);
-  if (moves.length === 0) return null;
-  const rand = () => moves[Math.floor(Math.random() * moves.length)];
-
-  if (diff === 'easy') return rand();
-  if (diff === 'medium') {
-    if (Math.random() < 0.55) return rand();
-    return greedyMove(board) || rand();
-  }
-  if (diff === 'hard' && Math.random() < 0.15) return rand();
-
-  try {
-    return findBestMove(board, 2, SEARCH_LIMITS[diff] || SEARCH_LIMITS.impossible) || rand();
-  } catch (err) {
-    console.error('bot search failed, falling back to greedy move', err);
-    return greedyMove(board) || rand();
-  }
 }
