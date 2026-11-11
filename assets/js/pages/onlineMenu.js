@@ -1,5 +1,6 @@
 import { applySystemTheme } from '../core/theme.js';
 import { initPageFadeIn, navigateTo } from '../core/transition.js';
+import { initBackButton } from '../components/backButton.js';
 import { initModal } from '../components/modal.js';
 import { waitForAuth } from '../core/firebase.js';
 
@@ -30,6 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('create-btn').addEventListener('click', e => handleOnlineNav(e, 'create-game/'));
   document.getElementById('join-btn').addEventListener('click', e => handleOnlineNav(e, 'join-game/'));
-  document.getElementById('back-btn').addEventListener('click', () => navigateTo('../'));
-  addTouchHover('.button, .tertiary-button');
+  initBackButton({ target: '../' });
+  addTouchHover('.button');
 });
