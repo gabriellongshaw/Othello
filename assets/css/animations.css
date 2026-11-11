@@ -55,3 +55,43 @@
   70%  { transform: scale(0.94); }
   100% { transform: scale(1); }
 }
+
+.page > :not(.leave-button):not(.credits-container):not(.button-container):not(.game-inner),
+.game-inner > *,
+.button-container > .button {
+  animation: fadeInUp 0.55s cubic-bezier(0.33, 1, 0.68, 1) backwards;
+}
+
+.page > :nth-child(1),
+.game-inner > :nth-child(1) { animation-delay: 0.05s; }
+.page > :nth-child(2),
+.game-inner > :nth-child(2) { animation-delay: 0.13s; }
+.page > :nth-child(3),
+.game-inner > :nth-child(3) { animation-delay: 0.21s; }
+.page > :nth-child(4),
+.game-inner > :nth-child(4) { animation-delay: 0.29s; }
+.page > :nth-child(5),
+.game-inner > :nth-child(5) { animation-delay: 0.37s; }
+.game-inner > :nth-child(6) { animation-delay: 0.45s; }
+.game-inner > :nth-child(7) { animation-delay: 0.53s; }
+
+.button-container > .button:nth-child(1) { animation-delay: 0.13s; }
+.button-container > .button:nth-child(2) { animation-delay: 0.21s; }
+.button-container > .button:nth-child(3) { animation-delay: 0.29s; }
+.button-container > .button:nth-child(4) { animation-delay: 0.37s; }
+.button-container > .button:nth-child(5) { animation-delay: 0.45s; }
+
+.page > .leave-button {
+  animation: fadeInUp 0.5s cubic-bezier(0.33, 1, 0.68, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
