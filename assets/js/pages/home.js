@@ -1,5 +1,6 @@
 import { applySystemTheme } from '../core/theme.js';
 import { initPageFadeIn, navigateTo } from '../core/transition.js';
+import { mountVersion } from '../components/version.js';
 
 function addTouchHover(selector) {
   document.querySelectorAll(selector).forEach(el => {
@@ -17,6 +18,7 @@ if ('serviceWorker' in navigator) {
 
 document.addEventListener('DOMContentLoaded', () => {
   applySystemTheme();
+  mountVersion(document.querySelector('.credits-container'), { inline: true });
   initPageFadeIn();
   addTouchHover('.button');
   document.querySelectorAll('.button').forEach(el => {

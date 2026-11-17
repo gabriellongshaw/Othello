@@ -8,6 +8,7 @@ import {
   cancelOfflineMove, restartOfflineGame, clearOfflineBoard
 } from '../modes/offline.js';
 import { sendIcon } from '../core/icons.js';
+import { mountVersion } from '../components/version.js';
 
 function addTouchHover(selector) {
   document.querySelectorAll(selector).forEach(el => {
@@ -21,6 +22,7 @@ function addTouchHover(selector) {
 
 document.addEventListener('DOMContentLoaded', () => {
   applySystemTheme();
+  mountVersion(document.querySelector('.page'));
   initPageFadeIn();
   initConfetti();
 

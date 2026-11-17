@@ -1,4 +1,4 @@
-const CACHE = 'othello-v4';
+const CACHE = 'othello-v5';
 
 const STATIC = [
   '/',
@@ -42,6 +42,7 @@ const STATIC = [
   '/assets/js/components/confetti.js',
   '/assets/js/components/modal.js',
   '/assets/js/components/qrScanner.js',
+  '/assets/js/components/version.js',
   '/assets/js/modes/bot.js',
   '/assets/js/modes/botEngine.js',
   '/assets/js/modes/offline.js',
@@ -79,6 +80,10 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  if (new URL(e.request.url).pathname.endsWith('/version.json')) {
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
